@@ -1,7 +1,37 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.collection-name {
+    display: block;
+    margin: 1rem auto;
+
+    border: 0;
+    text-align: center;
+    font-size: 2rem;
+    min-width: 30rem;
+
+    &:focus {
+        outline: none;
+        border-bottom: 1px solid gray;
+    }
+
+    &:focus::placeholder {
+        color: transparent;
+    }
+}
+
+.album-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+
+    min-height: 216px;
+
+    &:hover {
+        border: 2px dotted gray;
+        cursor: pointer;
+    }
+}

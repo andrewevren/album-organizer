@@ -6,7 +6,12 @@ export interface CollectionProps {}
 export function Collection(props: CollectionProps) {
   return (
     <div className={styles['container']}>
-      <h1>Welcome to Collection!</h1>
+      <input className={styles['collection-name']} placeholder='My New Collection'/>
+      <div className={styles['album-container']}>
+        <p>
+          Drag albums here!
+        </p>
+      </div>
     </div>
   );
 }

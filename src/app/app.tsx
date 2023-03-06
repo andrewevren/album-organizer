@@ -5,10 +5,10 @@ import Sidebar from './sidebar/sidebar';
 
 export function App() {
   return (
-    <>
+    <div className={styles['container']}>
       <Organizer />
       <Sidebar />
-    </>
+    </div>
   );
 }
 

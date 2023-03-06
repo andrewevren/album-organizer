@@ -6,7 +6,7 @@ export interface StyleSelectorProps {}
 export function StyleSelector(props: StyleSelectorProps) {
   return (
     <div className={styles['container']}>
-      <h1>Welcome to StyleSelector!</h1>
+      <button>Style</button>
     </div>
   );
 }

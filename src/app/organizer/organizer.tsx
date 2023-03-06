@@ -9,7 +9,10 @@ export function Organizer(props: OrganizerProps) {
   return (
     <div className={styles['container']}>
       <StyleSelector />
-      <Collection />
+      <div className={styles['collections-container']}>
+        <Collection />
+      </div>
+      <button className={styles['add-section']}>+</button>
     </div>
   );
 }
