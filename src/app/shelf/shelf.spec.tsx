@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import Collection from './collection';
+import Shelf from './shelf';
 
-describe('Collection', () => {
+describe('Shelf', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<Collection />);
+    const { baseElement } = render(<Shelf />);
     expect(baseElement).toBeTruthy();
   });
 });

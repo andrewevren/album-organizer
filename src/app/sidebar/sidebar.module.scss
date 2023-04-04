@@ -2,7 +2,7 @@
     height: 100vh;
     position: sticky;
     top: 0;
-    background-color: darkblue;
+    background-color: rgb(165, 165, 255);
 
     display: flex;
 }
@@ -43,7 +43,7 @@
 
 .sidebar-toggle {
     border: none;
-    background-color: blue;
+    background-color: rgb(70, 70, 250);
     width: 2rem;
 
     &:hover {

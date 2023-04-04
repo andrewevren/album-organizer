@@ -1,4 +1,4 @@
-import Collection from '../collection/collection';
+import Shelf from '../shelf/shelf';
 import StyleSelector from '../style-selector/style-selector';
 import styles from './organizer.module.scss';
 
@@ -9,8 +9,8 @@ export function Organizer(props: OrganizerProps) {
   return (
     <div className={styles['container']}>
       <StyleSelector />
-      <div className={styles['collections-container']}>
-        <Collection />
+      <div className={styles['shelf-container']}>
+        <Shelf />
       </div>
       <button className={styles['add-section']}>+</button>
     </div>

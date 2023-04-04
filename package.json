@@ -9,9 +9,13 @@
   },
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.3",
     "album-art": "^3.1.0",
+    "firebase": "^9.18.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "18.2.0",
+    "react-redux": "^8.0.5"
   },
   "devDependencies": {
     "@nrwl/cypress": "15.8.3",
