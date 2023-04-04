@@ -6,3 +6,9 @@ export interface AlbumSchema {
     shelf: string;
     title: string;
 }
+
+export interface ShelfSchema {
+    id: string;
+    order: number;
+    name: string;
+}
