@@ -7,7 +7,7 @@ import { AlbumSchema, ShelfSchema } from 'src/types/types';
 export const firestoreApi = createApi({
     baseQuery: fakeBaseQuery(),
     endpoints: builder => ({
-        getAlbums: builder.query<Array<AlbumSchema>, void> ({
+        getAlbums: builder.query<object, void> ({
             async queryFn() {
                 try {
                     const ref = collection(db, 'albums');
@@ -23,7 +23,7 @@ export const firestoreApi = createApi({
                 }
             }
         }),
-        getShelves: builder.query<Array<ShelfSchema>, void> ({
+        getShelves: builder.query<object, void> ({
             async queryFn() {
                 try {
                     const ref = collection(db, 'shelves');
