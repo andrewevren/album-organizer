@@ -42,4 +42,4 @@ export const firestoreApi = createApi({
     })
 })
 
-export const { useGetAlbumsQuery } = firestoreApi;
+export const { useGetAlbumsQuery, useGetShelvesQuery } = firestoreApi;

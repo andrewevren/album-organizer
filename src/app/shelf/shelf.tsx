@@ -4,7 +4,9 @@ import { AlbumSchema } from 'src/types/types';
 import Album from '../album/album';
 
 /* eslint-disable-next-line */
-export interface ShelfProps {}
+export interface ShelfProps {
+  name: string;
+}
 
 export function Shelf(props: ShelfProps) {
   const {
