@@ -1,14 +1,19 @@
 import styles from './shelf.module.scss';
-import { useGetAlbumsQuery } from 'src/api/firestoreApi';
+import { useState } from 'react';
+import { useGetAlbumsQuery, useChangeShelfNameMutation } from 'src/api/firestoreApi';
 import { AlbumSchema } from 'src/types/types';
 import Album from '../album/album';
 
 /* eslint-disable-next-line */
 export interface ShelfProps {
+  id: string;
   name: string;
 }
 
-export function Shelf(props: ShelfProps) {
+export function Shelf({id, name}: ShelfProps) {
+  const [currentName, setCurrentName] = useState(name);
+  const [changeShelfName, result] = useChangeShelfNameMutation();
+
   const {
     data: albums,
     isLoading,
@@ -24,13 +29,22 @@ export function Shelf(props: ShelfProps) {
     content = albums.map((album:AlbumSchema) => <Album key={album.id} imgUrl={album.imgUrl} artist={album.artist} title={album.title}/>)
   } else if (isError) {
     content = <p>Something went wrong</p>
-  } else if (albums instanceof Array && albums.length == 0) {
+  } else if (albums instanceof Array && albums.length === 0) {
     content = <p>Drag albums here!</p>
+  }
+
+  const onInputBlur = async () => {
+    try {
+      await changeShelfName({id, currentName})
+    } catch (err:any) {
+      //TODO: fix error catching, should revert change
+      console.log('Error!')
+    }
   }
 
   return (
     <div className={styles['container']}>
-      <input className={styles['shelf-name']} placeholder='My New Shelf'/>
+      <input className={styles['shelf-name']} value={currentName} onChange={(e) => setCurrentName(e.target.value)} onBlur={onInputBlur} placeholder='Name Your Shelf!'/>
       <div className={styles['album-container']}>
         {content}
       </div>
