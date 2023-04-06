@@ -1,6 +1,7 @@
 import styles from './shelf.module.scss';
 import { useState } from 'react';
-import { useGetAlbumsQuery, useChangeShelfNameMutation } from 'src/api/firestoreApi';
+import { useGetAlbumsQuery, useChangeShelfNameMutation, useDeleteShelfMutation } from 'src/api/firestoreApi';
+import { FaTrash } from 'react-icons/fa';
 import { AlbumSchema } from 'src/types/types';
 import Album from '../album/album';
 
@@ -12,7 +13,8 @@ export interface ShelfProps {
 
 export function Shelf({id, name}: ShelfProps) {
   const [currentName, setCurrentName] = useState(name);
-  const [changeShelfName, result] = useChangeShelfNameMutation();
+  const [changeShelfName, changeResult] = useChangeShelfNameMutation();
+  const [deleteShelf, deleteResult] = useDeleteShelfMutation();
 
   const {
     data: albums,
@@ -38,12 +40,24 @@ export function Shelf({id, name}: ShelfProps) {
       await changeShelfName({id, currentName})
     } catch (err:any) {
       //TODO: fix error catching, should revert change
-      console.log('Error!')
+      console.error('Name change error!')
     }
+  }
+
+  const onDeleteClick = async () => {
+    if (window.confirm("Delete this shelf? Action cannot be undone.")) {
+      try { 
+        await deleteShelf({id})
+      } catch (err:any) {
+        //TODO: error should revert change
+        console.error('Error occured when deleting shelf!')
+      }
+    } 
   }
 
   return (
     <div className={styles['container']}>
+      <FaTrash className={styles['trash']} onClick={onDeleteClick}/>
       <input className={styles['shelf-name']} value={currentName} onChange={(e) => setCurrentName(e.target.value)} onBlur={onInputBlur} placeholder='Name Your Shelf!'/>
       <div className={styles['album-container']}>
         {content}

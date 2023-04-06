@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
-import { collection, doc, getDocs, updateDoc, addDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { AlbumSchema, ShelfSchema } from 'src/types/types';
 
@@ -44,12 +44,25 @@ export const firestoreApi = createApi({
         addShelf: builder.mutation({
             async queryFn({newOrder}) {
                 try {
-                    const ref = collection(db, 'shelves')
+                    const ref = collection(db, 'shelves');
                     await addDoc(ref, {
                         name: "My New Shelf",
                         order: newOrder
                     });
                     return {data: null};
+                } catch (error: any) {
+                    console.error(error.message);
+                    return {error: error.message};
+                }
+            },
+            invalidatesTags: ['Shelf']
+        }),
+        deleteShelf: builder.mutation({
+            async queryFn({id}) {
+                try {
+                    const ref = doc(db, 'shelves', id);
+                    await deleteDoc(ref);
+                    return {data:null};
                 } catch (error: any) {
                     console.error(error.message);
                     return {error: error.message};
@@ -77,5 +90,6 @@ export const {
     useGetAlbumsQuery, 
     useGetShelvesQuery,
     useAddShelfMutation,
+    useDeleteShelfMutation,
     useChangeShelfNameMutation 
 } = firestoreApi;
