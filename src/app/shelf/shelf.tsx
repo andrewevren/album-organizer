@@ -21,10 +21,11 @@ export function Shelf({id, name}: ShelfProps) {
     isLoading,
     isSuccess,
     isError
-  } = useGetAlbumsQuery();
+  } = useGetAlbumsQuery(id);
 
   let content;
-
+  
+  //TODO: why isn't text rendering
   if (isLoading) {
     content = <p>Loading...</p>
   } else if (isSuccess && albums instanceof Array ) {
@@ -34,6 +35,7 @@ export function Shelf({id, name}: ShelfProps) {
   } else if (albums instanceof Array && albums.length === 0) {
     content = <p>Drag albums here!</p>
   }
+
 
   const onInputBlur = async () => {
     try {
@@ -45,7 +47,7 @@ export function Shelf({id, name}: ShelfProps) {
   }
 
   const onDeleteClick = async () => {
-    if (window.confirm("Delete this shelf? Action cannot be undone.")) {
+    if (window.confirm("Delete shelf? This action cannot be undone.")) {
       try { 
         await deleteShelf({id})
       } catch (err:any) {

@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
-import { collection, doc, getDocs, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, doc, getDocs, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { AlbumSchema, ShelfSchema } from 'src/types/types';
 
@@ -8,16 +8,20 @@ export const firestoreApi = createApi({
     baseQuery: fakeBaseQuery(),
     tagTypes: ['Shelf'],
     endpoints: builder => ({
-        getAlbums: builder.query<object, void> ({
-            async queryFn() {
+        getAlbums: builder.query<object, string> ({
+            async queryFn(id) {
                 try {
                     const ref = collection(db, 'albums');
-                    const querySnapshot = await getDocs(ref);
-                    const albums: Array<object> = [];
+                    const q = query(ref, where('shelf', '==', id));
+                    const querySnapshot = await getDocs(q);
+                    const albums: Array<AlbumSchema> = [];
                     querySnapshot?.forEach((doc) => {
-                        albums.push({id: doc.id, ...doc.data()})
+                        albums.push({id: doc.id, ...doc.data()} as AlbumSchema)
                     });
-                    return {data: albums};
+                    const sortedAlbums = albums.sort((a,b) => {
+                        return a.order - b.order;
+                    });
+                    return {data: sortedAlbums};
                 } catch (error: any) {
                     console.error(error.message);
                     return {error: error.message};
@@ -29,11 +33,14 @@ export const firestoreApi = createApi({
                 try {
                     const ref = collection(db, 'shelves');
                     const querySnapshot = await getDocs(ref);
-                    const shelves: Array<object> = [];
+                    const shelves: Array<ShelfSchema> = [];
                     querySnapshot?.forEach((doc) => {
-                        shelves.push({id: doc.id, ...doc.data()})
+                        shelves.push({id: doc.id, ...doc.data()} as ShelfSchema)
                     });
-                    return {data: shelves}
+                    const sortedShelves = shelves.sort((a,b) => {
+                        return a.order - b.order;
+                    });
+                    return {data: sortedShelves}
                 } catch (error: any) {
                     console.error(error.message);
                     return {error: error.message};
