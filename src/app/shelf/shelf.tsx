@@ -2,6 +2,7 @@ import styles from './shelf.module.scss';
 import { useState } from 'react';
 import { useGetAlbumsQuery, useChangeShelfNameMutation, useDeleteShelfMutation } from 'src/api/firestoreApi';
 import { FaTrash } from 'react-icons/fa';
+import { Draggable } from 'react-beautiful-dnd';
 import { AlbumSchema } from 'src/types/types';
 import Album from '../album/album';
 
@@ -9,9 +10,10 @@ import Album from '../album/album';
 export interface ShelfProps {
   id: string;
   name: string;
+  index: number;
 }
 
-export function Shelf({id, name}: ShelfProps) {
+export function Shelf({id, name, index}: ShelfProps) {
   const [currentName, setCurrentName] = useState(name);
   const [changeShelfName, changeResult] = useChangeShelfNameMutation();
   const [deleteShelf, deleteResult] = useDeleteShelfMutation();
@@ -23,7 +25,7 @@ export function Shelf({id, name}: ShelfProps) {
     isError
   } = useGetAlbumsQuery(id);
 
-  let content;
+  let content: any;
   
   //TODO: why isn't text rendering
   if (isLoading) {
@@ -58,13 +60,17 @@ export function Shelf({id, name}: ShelfProps) {
   }
 
   return (
-    <div className={styles['container']}>
-      <FaTrash className={styles['trash']} onClick={onDeleteClick}/>
-      <input className={styles['shelf-name']} value={currentName} onChange={(e) => setCurrentName(e.target.value)} onBlur={onInputBlur} placeholder='Name Your Shelf!'/>
-      <div className={styles['album-container']}>
-        {content}
-      </div>
-    </div>
+    <Draggable draggableId={id} index={index}>
+      {(provided) => (
+        <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} className={styles['container']}>
+          <FaTrash className={styles['trash']} onClick={onDeleteClick}/>
+          <input className={styles['shelf-name']} value={currentName} onChange={(e) => setCurrentName(e.target.value)} onBlur={onInputBlur} placeholder='Name Your Shelf!'/>
+          <div className={styles['album-container']}>
+            {content}
+          </div>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

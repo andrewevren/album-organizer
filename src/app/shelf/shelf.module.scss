@@ -6,6 +6,11 @@
     &:hover .trash{
         display: inline;
     }
+
+    &:hover {
+        border: 2px dotted gray;
+        cursor: pointer;
+    }
 }
 
 .shelf-name {
@@ -34,11 +39,6 @@
     flex-wrap: wrap;
 
     min-height: 216px;
-
-    &:hover {
-        border: 2px dotted gray;
-        cursor: pointer;
-    }
 }
 
 .trash {
