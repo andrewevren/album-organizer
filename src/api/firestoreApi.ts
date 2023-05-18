@@ -1,5 +1,6 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
-import { collection, query, where, doc, getDocs, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { current } from '@reduxjs/toolkit';
+import { collection, query, where, doc, getDocs, updateDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { AlbumSchema, ShelfSchema } from 'src/types/types';
 
@@ -25,6 +26,13 @@ export const firestoreApi = createApi({
                 } catch (error: any) {
                     console.error(error.message);
                     return {error: error.message};
+                }
+            }
+        }),
+        reorderAlbums: builder.mutation({
+            async queryFn(albumsToReorder) {
+                try {
+                    
                 }
             }
         }),
@@ -89,14 +97,52 @@ export const firestoreApi = createApi({
                     return {error: error.message};
                 }
             }
+        }),
+        reorderShelves: builder.mutation({
+            async queryFn(shelvesToReorder) {
+                try {
+                    const batch = writeBatch(db);
+                    shelvesToReorder.forEach((shelf: {id: string, index: number}) => {
+                        const ref = doc(db, 'shelves', shelf.id)
+                        batch.update(ref, {order: shelf.index})
+                    });
+                    await batch.commit();
+                    return {data: null};
+                } catch (error: any) {
+                    console.error(error.message);
+                    return {error: error.message};
+                }
+            },
+            async onQueryStarted(shelvesToReorder, {dispatch, queryFulfilled}) {
+                const patchResult = dispatch(
+                    firestoreApi.util.updateQueryData('getShelves', undefined, (draft) => {
+                        const shelvesCopy: Array<ShelfSchema> = draft;
+                        shelvesToReorder.forEach((shelf: {id: string, index: number}) => {
+                            const shelfToUpdate = shelvesCopy.find(item => item.id === shelf.id);
+                            if (shelfToUpdate) {
+                                shelfToUpdate.order = shelf.index;
+                            }
+                        })
+                        console.log(shelvesCopy)
+                        const sortedShelves = shelvesCopy.sort((a,b) => a.order - b.order);
+                        return sortedShelves;
+                    })
+                )
+                try {
+                    await queryFulfilled
+                } catch {
+                    patchResult.undo()
+                }
+            }
         })
     })
 })
 
 export const { 
-    useGetAlbumsQuery, 
+    useGetAlbumsQuery,
     useGetShelvesQuery,
     useAddShelfMutation,
     useDeleteShelfMutation,
-    useChangeShelfNameMutation 
+    useChangeShelfNameMutation,
+    useReorderShelvesMutation 
 } = firestoreApi;

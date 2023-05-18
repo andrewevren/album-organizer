@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import store from './app/store';
 import { Provider } from 'react-redux';

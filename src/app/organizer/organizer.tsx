@@ -39,7 +39,7 @@ export function Organizer(props: OrganizerProps) {
   return (
     <div className={styles['container']}>
       <StyleSelector />
-      <Droppable droppableId='organizer'>
+      <Droppable droppableId='organizer' type='shelf'>
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps} className={styles['shelf-container']}>
             {content}
