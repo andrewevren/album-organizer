@@ -1,29 +1,35 @@
 import styles from './shelf.module.scss';
 import { useState } from 'react';
-import { useGetAlbumsQuery, useChangeShelfNameMutation, useDeleteShelfMutation } from 'src/api/firestoreApi';
+import { useGetAlbumsQuery, useChangeShelfNameMutation } from 'src/api/firestoreApi';
 import { FaTrash } from 'react-icons/fa';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { AlbumSchema } from 'src/types/types';
 import Album from '../album/album';
 
-/* eslint-disable-next-line */
 export interface ShelfProps {
   id: string;
   name: string;
   index: number;
+  deleteHandler: (id: string, index: number)=>void;
 }
 
-export function Shelf({id, name, index}: ShelfProps) {
+export function Shelf({id, name, index, deleteHandler}: ShelfProps) {
   const [currentName, setCurrentName] = useState(name);
-  const [changeShelfName, changeResult] = useChangeShelfNameMutation();
-  const [deleteShelf, deleteResult] = useDeleteShelfMutation();
+  const [changeShelfName] = useChangeShelfNameMutation();
 
   const {
     data: albums,
     isLoading,
     isSuccess,
     isError
-  } = useGetAlbumsQuery(id);
+  } = useGetAlbumsQuery(undefined, {
+    selectFromResult: ({data, isLoading, isSuccess, isError}) => ({
+      data: data?.filter(album => album.shelf === id),
+      isLoading,
+      isSuccess,
+      isError
+    })
+  });
 
   let content: any;
   
@@ -31,7 +37,11 @@ export function Shelf({id, name, index}: ShelfProps) {
   if (isLoading) {
     content = <p>Loading...</p>
   } else if (isSuccess && albums instanceof Array ) {
-    content = albums.map((album:AlbumSchema) => <Album key={album.id} id={album.id} imgUrl={album.imgUrl} artist={album.artist} title={album.title} index={index}/>)
+    const albumsCopy = [...albums];
+    const sortedAlbums = albumsCopy.sort((a,b) => {
+      return a.order - b.order;
+    });
+    content = sortedAlbums.map((album:AlbumSchema, index: number) => <Album key={album.id} id={album.id} imgUrl={album.imgUrl} artist={album.artist} title={album.title} index={index}/>)
   } else if (isError) {
     content = <p>Something went wrong</p>
   } else if (albums instanceof Array && albums.length === 0) {
@@ -48,16 +58,10 @@ export function Shelf({id, name, index}: ShelfProps) {
     }
   }
 
-  const onDeleteClick = async () => {
-    if (window.confirm("Delete shelf? This action cannot be undone.")) {
-      try { 
-        await deleteShelf({id})
-      } catch (err:any) {
-        //TODO: error should revert change
-        console.error('Error occured when deleting shelf!')
-      }
-    } 
+  const onDeleteClick = () => {
+    deleteHandler(id, index);
   }
+
 
   return (
     <Draggable draggableId={id} index={index}>

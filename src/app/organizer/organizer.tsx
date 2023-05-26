@@ -1,4 +1,4 @@
-import { useAddShelfMutation, useGetShelvesQuery } from 'src/api/firestoreApi';
+import { useAddShelfMutation, useGetShelvesQuery, useDeleteShelfMutation, useReorderShelvesMutation } from 'src/api/firestoreApi';
 import { ShelfSchema } from 'src/types/types';
 import { Droppable } from 'react-beautiful-dnd';
 import Shelf from '../shelf/shelf';
@@ -9,7 +9,9 @@ import styles from './organizer.module.scss';
 export interface OrganizerProps {}
 
 export function Organizer(props: OrganizerProps) {
-  const [addShelf, result] = useAddShelfMutation();
+  const [addShelf] = useAddShelfMutation();
+  const [deleteShelf] = useDeleteShelfMutation();
+  const [reorderShelves] = useReorderShelvesMutation();
 
   const {
     data: shelves,
@@ -23,17 +25,39 @@ export function Organizer(props: OrganizerProps) {
   if (isLoading) {
     content = <p>Loading...</p>
   } else if (isSuccess && shelves instanceof Array) {
-    content = shelves.map((shelf: ShelfSchema, index: number) => <Shelf key={shelf.id} id={shelf.id} name={shelf.name} index={index}/>)
+    const shelvesCopy = [...shelves]
+    const sortedShelves = shelvesCopy.sort((a,b) => {
+      return a.order - b.order;
+    });
+  
+    const deleteHandler = async (id: string, index: number) => {
+      if (window.confirm("Delete shelf? This action cannot be undone.")) {
+        try { 
+          const sortedShelvesCopy = [...sortedShelves];
+          sortedShelvesCopy.splice(index, 1);
+          const shelvesToReorder: Array<object> = [];
+          for (let i = index; i <= sortedShelvesCopy.length - 1; i++) {
+            const newShelf = {id: sortedShelvesCopy[i].id, index: i};
+            shelvesToReorder.push(newShelf);
+          } 
+          await deleteShelf({id});
+          await reorderShelves(shelvesToReorder);
+        } catch (err:any) {
+          console.error('Error occured when deleting shelf!')
+        }
+      } 
+    }
+
+    content = sortedShelves.map((shelf: ShelfSchema, index: number) => <Shelf key={shelf.id} id={shelf.id} name={shelf.name} index={index} deleteHandler={deleteHandler}/>)
   } else if (isError) {
     content = <p>Something went wrong :/</p>
   }
 
   const plusClick = async () => {
-    let newOrder = 1;
     if (shelves instanceof Array) {
-      newOrder = shelves[shelves.length-1].order + 1;
+      const newOrder = shelves.length;
+      await addShelf({newOrder});
     }
-    await addShelf({newOrder});
   }
 
   return (

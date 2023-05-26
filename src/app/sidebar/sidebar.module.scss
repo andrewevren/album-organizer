@@ -2,9 +2,13 @@
     height: 100vh;
     position: sticky;
     top: 0;
-    background-color: rgb(165, 165, 255);
-
+    background-color: #202124;
     display: flex;
+
+    &:hover {
+        background-color: #37383A;
+        cursor: pointer;
+    }
 }
 
 .sidebar-content {
@@ -18,10 +22,20 @@
 .input {
     display: block;
     margin-bottom: 1rem;
+    background-color: #6B728E;
+    padding: .5rem;
+    border-color: transparent;
+    border-radius: 25px;
+}
+
+::placeholder {
+    color: black;
 }
 
 .search-submit {
     display: block;
+    border-radius: 25px;
+    border-color: transparent;
 }
 
 .new-album-box {
@@ -32,22 +46,49 @@
     margin: 1rem auto;
 }
 
-.new-album-art {
-    height:140px;
-    width: 140px;
-}
-
-.save-submit {
-    display: block;
-}
-
 .sidebar-toggle {
     border: none;
-    background-color: rgb(70, 70, 250);
+    background-color: #737476;
     width: 2rem;
 
     &:hover {
-        background-color: rgb(0, 0, 206);
+        background-color: #AFAFB0;
+        cursor: pointer;
+    }
+}
+
+.error {
+    border: 2px dotted red;
+    background-color: rgb(243, 115, 141);
+    color: red;
+    padding:10%;
+    margin: 1rem auto;
+    width: 90%;
+    border-radius: 25px;
+}
+
+.delete-box {
+    box-sizing: border-box;
+    border: 2px dashed transparent;
+    position: relative;
+    margin: 0 auto;
+    height: 142px;
+    width: 142px;
+    &:hover {
+        border-color: white;
+    }
+}
+
+.trash {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    font-size: 4rem;
+
+    &:hover {
         cursor: pointer;
     }
 }

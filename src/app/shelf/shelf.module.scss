@@ -1,14 +1,17 @@
 .container {
     width: 90%;
-    margin: 0 auto;
+    margin: 0 auto 10px;
     position: relative;
+    background-color: #202124;
+    border: 2px solid #5F6368;
+    border-radius: 25px;
 
     &:hover .trash{
         display: inline;
     }
 
     &:hover {
-        border: 2px dotted gray;
+        border-color: #5F6368;
         cursor: pointer;
     }
 }
@@ -16,6 +19,8 @@
 .shelf-name {
     display: block;
     margin: 1rem auto;
+    background-color: #202124;
+    font-family: 'Open Sans', sans-serif;
 
     border: 0;
     text-align: center;
@@ -24,7 +29,7 @@
 
     &:focus {
         outline: none;
-        border-bottom: 1px solid gray;
+        border-bottom: 1px solid #6B728E;
     }
 
     &:focus::placeholder {
@@ -43,8 +48,8 @@
 
 .trash {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 25px;
+    left: 25px;
     display: none;
     font-size: 1.5rem;
 
