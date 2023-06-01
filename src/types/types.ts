@@ -5,10 +5,12 @@ export interface AlbumSchema {
     order: number;
     shelf: string;
     title: string;
+    uid: string;
 }
 
 export interface ShelfSchema {
     id: string;
     order: number;
     name: string;
+    uid: string;
 }

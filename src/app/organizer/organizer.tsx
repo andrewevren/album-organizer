@@ -6,9 +6,11 @@ import StyleSelector from '../style-selector/style-selector';
 import styles from './organizer.module.scss';
 
 /* eslint-disable-next-line */
-export interface OrganizerProps {}
+export interface OrganizerProps {
+  user: string;
+}
 
-export function Organizer(props: OrganizerProps) {
+export function Organizer({user}: OrganizerProps) {
   const [addShelf] = useAddShelfMutation();
   const [deleteShelf] = useDeleteShelfMutation();
   const [reorderShelves] = useReorderShelvesMutation();
@@ -18,7 +20,7 @@ export function Organizer(props: OrganizerProps) {
     isLoading,
     isSuccess,
     isError
-  } = useGetShelvesQuery();
+  } = useGetShelvesQuery(user);
 
   let content: any;
 
@@ -40,15 +42,15 @@ export function Organizer(props: OrganizerProps) {
             const newShelf = {id: sortedShelvesCopy[i].id, index: i};
             shelvesToReorder.push(newShelf);
           } 
-          await deleteShelf({id});
-          await reorderShelves(shelvesToReorder);
+          await deleteShelf({id, user});
+          await reorderShelves({shelvesToReorder, user});
         } catch (err:any) {
           console.error('Error occured when deleting shelf!')
         }
       } 
     }
 
-    content = sortedShelves.map((shelf: ShelfSchema, index: number) => <Shelf key={shelf.id} id={shelf.id} name={shelf.name} index={index} deleteHandler={deleteHandler}/>)
+    content = sortedShelves.map((shelf: ShelfSchema, index: number) => <Shelf key={shelf.id} id={shelf.id} name={shelf.name} index={index} user={user} deleteHandler={deleteHandler}/>)
   } else if (isError) {
     content = <p>Something went wrong :/</p>
   }
@@ -56,7 +58,7 @@ export function Organizer(props: OrganizerProps) {
   const plusClick = async () => {
     if (shelves instanceof Array) {
       const newOrder = shelves.length;
-      await addShelf({newOrder});
+      await addShelf({newOrder, user});
     }
   }
 

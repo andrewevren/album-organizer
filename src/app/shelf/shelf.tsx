@@ -10,10 +10,11 @@ export interface ShelfProps {
   id: string;
   name: string;
   index: number;
+  user: string;
   deleteHandler: (id: string, index: number)=>void;
 }
 
-export function Shelf({id, name, index, deleteHandler}: ShelfProps) {
+export function Shelf({id, name, index, user, deleteHandler}: ShelfProps) {
   const [currentName, setCurrentName] = useState(name);
   const [changeShelfName] = useChangeShelfNameMutation();
 
@@ -22,7 +23,7 @@ export function Shelf({id, name, index, deleteHandler}: ShelfProps) {
     isLoading,
     isSuccess,
     isError
-  } = useGetAlbumsQuery(undefined, {
+  } = useGetAlbumsQuery(user, {
     selectFromResult: ({data, isLoading, isSuccess, isError}) => ({
       data: data?.filter(album => album.shelf === id),
       isLoading,

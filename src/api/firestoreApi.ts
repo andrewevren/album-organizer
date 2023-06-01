@@ -1,7 +1,5 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
-import { current } from '@reduxjs/toolkit';
 import { collection, query, where, doc, getDocs, updateDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
-import { getAuth, signInAnonymously } from "firebase/auth";
 import { db } from '../utils/firebase';
 import { AlbumSchema, ShelfSchema } from 'src/types/types';
 
@@ -10,11 +8,12 @@ export const firestoreApi = createApi({
     baseQuery: fakeBaseQuery(),
     tagTypes: ['Album', 'Shelf'],
     endpoints: builder => ({
-        getAlbums: builder.query<object, void> ({
-            async queryFn() {
+        getAlbums: builder.query<object, string> ({
+            async queryFn(user) {
                 try {
                     const ref = collection(db, 'albums');
-                    const querySnapshot = await getDocs(ref);
+                    const q = query(ref, where('uid','==',user))
+                    const querySnapshot = await getDocs(q);
                     const albums: Array<AlbumSchema> = [];
                     querySnapshot?.forEach((doc) => {
                         albums.push({id: doc.id, ...doc.data()} as AlbumSchema)
@@ -54,9 +53,9 @@ export const firestoreApi = createApi({
                     return {error: error.message};
                 }
             },
-            async onQueryStarted({id}, {dispatch, queryFulfilled}) {
+            async onQueryStarted({id, user}, {dispatch, queryFulfilled}) {
                 const patchResult = dispatch(
-                    firestoreApi.util.updateQueryData('getAlbums', undefined, (draft) => {
+                    firestoreApi.util.updateQueryData('getAlbums', user, (draft) => {
                         const albumToDelete = draft.find(item => item.id === id);
                         albumToDelete.shelf = 'deleted'
                     })
@@ -69,8 +68,10 @@ export const firestoreApi = createApi({
             }
         }),
         reorderAlbums: builder.mutation({
-            async queryFn(albumsToReorder) {
+            async queryFn({albumsToReorder, user}) {
                 try {
+                    console.log(albumsToReorder)
+                    console.log(user)
                     const batch = writeBatch(db);
                     albumsToReorder.forEach((album: {id: string, index: number, shelf: string}) => {
                         const ref = doc(db, 'albums', album.id);
@@ -83,9 +84,9 @@ export const firestoreApi = createApi({
                     return {error: error.message};
                 }
             },
-            async onQueryStarted(albumsToReorder, {dispatch, queryFulfilled}) {
+            async onQueryStarted({albumsToReorder, user}, {dispatch, queryFulfilled}) {
                 const patchResult = dispatch(
-                    firestoreApi.util.updateQueryData('getAlbums', undefined, (draft) => {
+                    firestoreApi.util.updateQueryData('getAlbums', user, (draft) => {
                         albumsToReorder.forEach((album: {id: string, index: number, shelf: string}) => {
                             const albumToUpdate = draft.find(item => item.id === album.id);
                             if (albumToUpdate) {
@@ -102,11 +103,12 @@ export const firestoreApi = createApi({
                 }
             }
         }),
-        getShelves: builder.query<object, void> ({
-            async queryFn() {
+        getShelves: builder.query<object, string> ({
+            async queryFn(user) {
                 try {
                     const ref = collection(db, 'shelves');
-                    const querySnapshot = await getDocs(ref);
+                    const q = query(ref, where('uid','==',user))
+                    const querySnapshot = await getDocs(q);
                     const shelves: Array<ShelfSchema> = [];
                     querySnapshot?.forEach((doc) => {
                         shelves.push({id: doc.id, ...doc.data()} as ShelfSchema)
@@ -120,12 +122,13 @@ export const firestoreApi = createApi({
             providesTags: ['Shelf']
         }),
         addShelf: builder.mutation({
-            async queryFn({newOrder}) {
+            async queryFn({newOrder, user}) {
                 try {
                     const ref = collection(db, 'shelves');
                     await addDoc(ref, {
                         name: "My New Shelf",
-                        order: newOrder
+                        order: newOrder,
+                        uid: user
                     });
                     return {data: null};
                 } catch (error: any) {
@@ -170,7 +173,7 @@ export const firestoreApi = createApi({
             }
         }),
         reorderShelves: builder.mutation({
-            async queryFn(shelvesToReorder) {
+            async queryFn({shelvesToReorder}) {
                 try {
                     const batch = writeBatch(db);
                     shelvesToReorder.forEach((shelf: {id: string, index: number}) => {
@@ -184,9 +187,9 @@ export const firestoreApi = createApi({
                     return {error: error.message};
                 }
             },
-            async onQueryStarted(shelvesToReorder, {dispatch, queryFulfilled}) {
+            async onQueryStarted({shelvesToReorder, user}, {dispatch, queryFulfilled}) {
                 const patchResult = dispatch(
-                    firestoreApi.util.updateQueryData('getShelves', undefined, (draft) => {
+                    firestoreApi.util.updateQueryData('getShelves', user, (draft) => {
                         shelvesToReorder.forEach((shelf: {id: string, index: number}) => {
                             const shelfToUpdate = draft.find(item => item.id === shelf.id);
                             if (shelfToUpdate) {
@@ -201,7 +204,7 @@ export const firestoreApi = createApi({
                     patchResult.undo()
                 }
             }
-        }),
+        })
     })
 })
 

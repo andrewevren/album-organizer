@@ -8,9 +8,11 @@ import StackableAlbum from '../album/stackableAlbum';
 import { FaTrash } from 'react-icons/fa';
 
 /* eslint-disable-next-line */
-export interface SidebarProps {}
+export interface SidebarProps {
+  user: string;
+}
 
-export function Sidebar(props: SidebarProps) {
+export function Sidebar({user}: SidebarProps) {
   const [barOpen, setBarOpen] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ export function Sidebar(props: SidebarProps) {
 
   const [addAlbum] = useAddAlbumMutation();
 
-  const { albums } = useGetAlbumsQuery(undefined, {
+  const { albums } = useGetAlbumsQuery(user, {
     selectFromResult: ({data}) => ({
       albums: data?.filter(album => album.shelf === 'new')
     })
@@ -55,7 +57,8 @@ export function Sidebar(props: SidebarProps) {
           imgUrl: response,
           order: albums.length,
           shelf: 'new',
-          title: formData.album
+          title: formData.album,
+          uid: user
         }
         addAlbum(newAlbum);
       }).catch((error: any) => {
@@ -69,7 +72,8 @@ export function Sidebar(props: SidebarProps) {
   return (
     <div className={styles['container']}>
       {barOpen ?
-        <div className={styles['sidebar-content']} onClick={handleToggle}>
+      //TODO: rework all this toggling business
+        <div className={styles['sidebar-content']}>
           <div>
             <h2>Add an Album</h2>
             <form onSubmit={handleSubmit}>
