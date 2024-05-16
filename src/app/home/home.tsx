@@ -21,8 +21,6 @@ export function Home({user}: HomeProps) {
   const [reorderAlbums] = useReorderAlbumsMutation();
   const [deleteAlbum] = useDeleteAlbumMutation();
 
-  console.log(user)
-
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
 
@@ -73,9 +71,9 @@ export function Home({user}: HomeProps) {
         const newAlbum = {id: sourceAlbums[i].id, index: i, shelf: home.id};
         sourceAlbumsToReorder.push(newAlbum);
       }
-      reorderAlbums({sourceAlbumsToReorder, user});
+      reorderAlbums({albumsToReorder: sourceAlbumsToReorder, user});
       const id = dragged[0].id;
-      deleteAlbum({id});
+      deleteAlbum({id, user});
       return;
     }
 

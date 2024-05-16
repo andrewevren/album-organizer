@@ -70,8 +70,6 @@ export const firestoreApi = createApi({
         reorderAlbums: builder.mutation({
             async queryFn({albumsToReorder, user}) {
                 try {
-                    console.log(albumsToReorder)
-                    console.log(user)
                     const batch = writeBatch(db);
                     albumsToReorder.forEach((album: {id: string, index: number, shelf: string}) => {
                         const ref = doc(db, 'albums', album.id);
